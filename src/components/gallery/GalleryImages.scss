@@ -1,0 +1,18 @@
+.gallery-container {
+  text-align: center;
+  .imageGroup {
+    color: gray;
+    margin: 15px 0px;
+    padding: 15px;
+    border: 2px solid gray;
+    &__images {
+      margin: auto;
+      img {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+    }
+  }
+}

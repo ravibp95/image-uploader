@@ -1,0 +1,18 @@
+.imageUploader-container {
+  text-align: center;
+}
+.hide {
+  display: none;
+}
+.show {
+  max-width: 100%;
+  zoom: 0.2;
+}
+.ReactCrop {
+  zoom: 0.2;
+}
+.ReactCrop__crop-selection {
+  border: 8px dotted white !important;
+  -webkit-box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.7) !important;
+}
