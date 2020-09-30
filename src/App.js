@@ -9,12 +9,6 @@ function App() {
     <div className="App container">
       <Router>
         <div>Go to:</div>
-        <div>
-          <Link to="/image-upload">Upload Image Page</Link>
-        </div>
-        <div>
-          <Link to="/gallery">Gallery Page</Link>
-        </div>
         <Switch>
           <Route exact path="/" render={()=>(
             <Redirect to="image-upload"/>

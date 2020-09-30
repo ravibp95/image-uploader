@@ -24,6 +24,8 @@ export default class ImageCropper extends PureComponent {
   onCropComplete = (crop) => {
     this.makeClientCrop(crop);
   };
+
+  // Handle Image crop in the browser
   async makeClientCrop(crop) {
     const { width, height, imageKey } = this.props;
     if (this.imageRef && crop.width && crop.height) {
@@ -32,9 +34,10 @@ export default class ImageCropper extends PureComponent {
         crop,
         `newFile-${width}x${height}.jpeg`
       );
-      this.props.updateCroppedImages(imageKey, croppedImageBlob, width, height);
+      this.props.updateCroppedImages(imageKey, croppedImageBlob);
     }
   }
+  // Get the cropped Image as a Blob
   getCroppedImg = (image, crop, fileName) => {
     const canvas = document.createElement("canvas");
     const scaleX = image.naturalWidth / image.width;
@@ -68,17 +71,19 @@ export default class ImageCropper extends PureComponent {
       );
     });
   };
+
+  // Convert the Blob to Image URL 
   computeImageUrl = () => {
     return URL.createObjectURL(this.props.croppedImageBlob)
   }
   render() {
-    const { imgSrc, width, height, croppedImageBlob } = this.props;
+    const { imageUrl, width, height, croppedImageBlob } = this.props;
     const { crop } = this.state;
 
     return (
       <div className="imageCropper-container">
         <ReactCrop
-          src={imgSrc}
+          src={imageUrl}
           crop={crop}
           keepSelection={true}
           locked={true}

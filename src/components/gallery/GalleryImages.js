@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import _ from "lodash";
+import { Link } from "react-router-dom";
 import { database } from "../../config";
 import "./GalleryImages.scss";
 
@@ -40,33 +41,38 @@ export default class GalleryImages extends Component {
   render() {
     const { images } = this.state;
     return (
-      <div className="gallery-container">
-        <div className="row">
-          <div className="col-12">
-            <h1>Gallery</h1>
-          </div>
-          {images.length > 0 &&
-            images.map((imgObj) => {
-              return (
-                <div key={imgObj.imgGroupId} className="row imageGroup">
-                  {imgObj.imageGroupSorted.map((imgGrpObj, index) => (
-                    <div
-                      key={`${imgObj.imgGroupId}${index}`}
-                      className="col-3 imageGroup__images"
-                    >
-                      <div className="image-container">
-                        <img src={imgGrpObj.url} alt="preview" />
-                        <p>
-                          {imgGrpObj.width}x{imgGrpObj.height}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+      <>
+        <div>
+          <Link to="/image-upload">Upload Image Page</Link>
         </div>
-      </div>
+        <div className="gallery-container">
+          <div className="row">
+            <div className="col-12">
+              <h1>Gallery</h1>
+            </div>
+            {images.length > 0 &&
+              images.map((imgObj) => {
+                return (
+                  <div key={imgObj.imgGroupId} className="row imageGroup">
+                    {imgObj.imageGroupSorted.map((imgGrpObj, index) => (
+                      <div
+                        key={`${imgObj.imgGroupId}${index}`}
+                        className="col-3 imageGroup__images"
+                      >
+                        <div className="image-container">
+                          <img src={imgGrpObj.url} alt="preview" />
+                          <p>
+                            {imgGrpObj.width}x{imgGrpObj.height}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </>
     );
   }
 }
