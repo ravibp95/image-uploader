@@ -1,45 +1,50 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { Link } from "react-router-dom";
-import { database } from "../../config";
+import { database, firebase } from "../../config";
 import "./GalleryImages.scss";
 
 export default class GalleryImages extends Component {
-  state = { images: [] };
+  state = { imageGroups: [] };
   componentDidMount() {
-    this.fetchImages();
+    this.fetchImagesDB();
   }
 
-  fetchImages = () => {
+  fetchImagesDB = () => {
     const dbEndPoint = `images`;
     database
       .ref()
       .child(dbEndPoint)
       .on("value", (snapshot) => {
-        let images = [];
-        _.map(snapshot.val(), (value, key) => {
+        let imageGroups = [];
+        _.map(snapshot.val(), (imgGrp, key) => {
           const imageGroup = [];
-          for (let [imgKey, imgValue] of Object.entries(value)) {
+          Object.values(imgGrp).forEach((image) => {
             imageGroup.push({
-              name: imgValue.name,
-              url: imgValue.url,
-              width: imgValue.width,
-              height: imgValue.height,
+              name: image.name,
+              url: image.url,
+              width: image.width,
+              height: image.height,
             });
-          }
-          const imageGroupSorted = _.sortBy(imageGroup, ["width", "height"]);
+          });
+          const imageGroupSortedList = _.sortBy(imageGroup, [
+            "width",
+            "height",
+          ]);
 
-          const imgObj = {
-            imgGroupId: key,
-            imageGroupSorted,
+          const imageGroupObject = {
+            imageGroupId: key,
+            imageGroupSortedList,
           };
-          images.push(imgObj);
+          imageGroups.push(imageGroupObject);
         });
-        this.setState({ images });
+        if (window.location.pathname == "/gallery") {
+          this.setState({ imageGroups: imageGroups.reverse() });
+        }
       });
   };
   render() {
-    const { images } = this.state;
+    const { imageGroups } = this.state;
     return (
       <>
         <div>
@@ -50,23 +55,28 @@ export default class GalleryImages extends Component {
             <div className="col-12">
               <h1>Gallery</h1>
             </div>
-            {images.length > 0 &&
-              images.map((imgObj) => {
+            {imageGroups.length > 0 &&
+              imageGroups.map((imageGroupObject) => {
                 return (
-                  <div key={imgObj.imgGroupId} className="row imageGroup">
-                    {imgObj.imageGroupSorted.map((imgGrpObj, index) => (
-                      <div
-                        key={`${imgObj.imgGroupId}${index}`}
-                        className="col-3 imageGroup__images"
-                      >
-                        <div className="image-container">
-                          <img src={imgGrpObj.url} alt="preview" />
-                          <p>
-                            {imgGrpObj.width}x{imgGrpObj.height}
-                          </p>
+                  <div
+                    key={imageGroupObject.imageGroupId}
+                    className="row imageGroup"
+                  >
+                    {imageGroupObject.imageGroupSortedList.map(
+                      (image, index) => (
+                        <div
+                          key={`${imageGroupObject.imageGroupId}-${index}`}
+                          className="col-3 imageGroup__images"
+                        >
+                          <div className="image-container">
+                            <img src={image.url} alt="preview" />
+                            <p>
+                              {image.width}x{image.height}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 );
               })}

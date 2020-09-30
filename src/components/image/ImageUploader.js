@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { IMAGE_DIMENSIONS } from "../../constants/ImageDimensions";
 import { storage, database } from "../../config";
 import ImageCropper from "./ImageCropper";
+import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./ImageUploader.scss";
 
 export default class ImageUploader extends Component {
@@ -23,6 +24,7 @@ export default class ImageUploader extends Component {
       y: 0,
     },
     imagegUploadFlag: null,
+    dimensions: null,
   };
   fileRef = React.createRef();
 
@@ -34,25 +36,30 @@ export default class ImageUploader extends Component {
     });
   };
 
-  // Handle file upload of type image 
+  // Handle file upload of type image
   handleChange = (e) => {
     const file = e.target.files[0];
-    const imageUrl = URL.createObjectURL(file);
-    let isValidImageType = true;
-    if (!/^image\//.test(file.type)) {
-      isValidImageType = false;
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      let isValidImageType = true;
+      if (!/^image\//.test(file.type)) {
+        isValidImageType = false;
+      }
+      this.setState({
+        imageUrl,
+        isValidImageType,
+        isValidImageDimension: null,
+        imagegUploadFlag: null,
+        dimensions: null,
+      });
     }
-    this.setState({
-      imageUrl,
-      isValidImageType,
-      isValidImageDimension: null,
-      imagegUploadFlag: null,
-    });
   };
 
   onImgLoad = ({ target: img }) => {
     const height = img.offsetHeight;
     const width = img.offsetWidth;
+    this.setState({ dimensions: `${width}x${height}` });
+    console.log(`Image dimensions: ${width}x${height}`);
     // TODO: Image of 1024x1024 dimension gets identified as 1025x1025. Need to check why that's happening.
     if (height >= 1024 && height <= 1025 && width >= 1024 && width <= 1025) {
       this.setState({ isValidImageDimension: true });
@@ -104,12 +111,21 @@ export default class ImageUploader extends Component {
   };
 
   render() {
-    const { isValidImageType, imageUrl, isValidImageDimension, imagegUploadFlag } = this.state;
+    const {
+      isValidImageType,
+      imageUrl,
+      isValidImageDimension,
+      imagegUploadFlag,
+      dimensions,
+    } = this.state;
+    const gallerLink = (
+      <div>
+        <Link to="/gallery">Gallery Page</Link>
+      </div>
+    );
     return (
-      <>
-        <div>
-          <Link to="/gallery">Gallery Page</Link>
-        </div>
+      <ErrorBoundary>
+        {gallerLink}
         <div className="row imageUploader-container">
           <div className="col-12">
             <h1>Image Uploader</h1>
@@ -134,14 +150,17 @@ export default class ImageUploader extends Component {
                     <img
                       onLoad={this.onImgLoad}
                       src={imageUrl}
-                      className={isValidImageDimension === false ? "hide" : "show zoom"}
+                      className={"show zoom"}
+                      // className={isValidImageDimension === false ? "hide" : "show zoom"}
                       alt="preview"
                     />
                   </div>
                 </div>
               </>
             )}
-            {isValidImageDimension === false && <p>Not a valid image dimension</p>}
+            {isValidImageDimension === false && (
+              <p>Not a valid image dimension: {dimensions}</p>
+            )}
           </div>
           {isValidImageDimension && (
             <div className="col-12">
@@ -167,14 +186,19 @@ export default class ImageUploader extends Component {
                 })}
                 <div className="col-12 mt-5">
                   <button onClick={this.handleUpload}>Upload images</button>
-                  {imagegUploadFlag === true && <p>Images uploaded successfully.</p>}
+                  {imagegUploadFlag === true && (
+                    <>
+                      <p>Images uploaded successfully.</p>
+                      {gallerLink}
+                    </>
+                  )}
                   {imagegUploadFlag === false && <p>Image upload failed.</p>}
                 </div>
               </div>
             </div>
           )}
         </div>
-      </>
+      </ErrorBoundary>
     );
   }
 }
